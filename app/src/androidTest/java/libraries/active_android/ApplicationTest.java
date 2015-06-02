@@ -1,4 +1,4 @@
-package com.test;
+package libraries.active_android;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
