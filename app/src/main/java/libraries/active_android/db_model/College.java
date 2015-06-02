@@ -13,7 +13,7 @@ import java.util.List;
 @Table(name = "College")
 public class College extends Model{
 
-    @Column(name = "college_id", unique = true, onUniqueConflict = Column.ConflictAction.FAIL)
+    @Column(name = "college_id", unique = true)
     private int collegeId;
     @Column(name = "college_name")
     private String collegeName;
@@ -49,8 +49,16 @@ public class College extends Model{
         return new Select().from(College.class).execute();
     }
 
-    public static List<College> getCollege(int collegeId) {
-        return new Select().from(College.class).where("college_id = ?", collegeId).execute();
+    public static College getCollege(int collegeId) {
+        return new Select().from(College.class).where("college_id = ?", collegeId).executeSingle();
     }
+
+
+    // Used to return items from another table based on the foreign key
+    public List<Student> getAllStudent() {
+        return getMany(Student.class, "College");
+    }
+
+
 
 }

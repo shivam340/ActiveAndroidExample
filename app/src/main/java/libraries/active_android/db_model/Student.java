@@ -64,8 +64,8 @@ public class Student extends Model {
         return new Select().from(Student.class).execute();
     }
 
-    public static List<Student> getStudent(int studentId) {
-        return new Select().from(Student.class).where("student_id = ?", studentId).execute();
+    public static Student getStudent(int studentId) {
+        return new Select().from(Student.class).where("student_id = ?", studentId).executeSingle();
     }
 
 }
