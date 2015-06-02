@@ -7,8 +7,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
@@ -18,25 +16,19 @@ import libraries.active_android.db_model.Student;
 
 public class MainActivity extends ActionBarActivity {
 
-
     private int mStudentId = -1;
     private String mStudentName = null;
     private int mCollegeId = -1;
     private String mCollegeName = null;
 
-
     @InjectView(R.id.edt_college_id)
     protected EditText editTextCollegeId;
-
     @InjectView(R.id.edt_college_name)
     protected EditText editTextCollegeName;
-
     @InjectView(R.id.edt_student_id)
     protected EditText editTextStudentId;
-
     @InjectView(R.id.edt_student_name)
     protected EditText editTextStudentName;
-
     @InjectView(R.id.txt_status_message)
     protected TextView textViewStatusMessage;
 
@@ -46,6 +38,12 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ButterKnife.reset(this);
     }
 
     private boolean isValidData() {
@@ -92,6 +90,18 @@ public class MainActivity extends ActionBarActivity {
             student.setCollege(college);
             student.save();
 
+            student = new Student();
+            student.setStudentId(mStudentId + 1);
+            student.setStudentName(mStudentName + "_" + (mStudentId + 1));
+            student.setCollege(college);
+            student.save();
+
+            student = new Student();
+            student.setStudentId(mStudentId + 2);
+            student.setStudentName(mStudentName + "_" + (mStudentId + 2));
+            student.setCollege(college);
+            student.save();
+
             textViewStatusMessage.setText("data saved successfully.");
             textViewStatusMessage.setTextColor(getResources().getColor(android.R.color
                     .holo_green_dark));
@@ -119,26 +129,45 @@ public class MainActivity extends ActionBarActivity {
         mStudentId = (sid == null ? -1 :
                 (sid.trim().length() > 0 ? Integer.parseInt(sid) : -1));
 
-        ArrayList<Student> studentArrayList = (ArrayList<Student>) Student.getStudent(mStudentId);
+        Student student = Student.getStudent(mStudentId);
 
-        if (studentArrayList != null && studentArrayList.size() > 0) {
+        if (student != null) {
+            Log.d("id is ", "" + student.getId());
+            Log.d("student id is ", "" + student.getStudentId());
+            Log.d("student name is ", "" + student.getStudentName());
+            Log.d("college id is ", "" + student.getCollege().getCollegeId());
+            Log.d("college name is ", "" + student.getCollege().getCollegeName());
 
-            Student student = studentArrayList.get(0);
-
-            if (student != null) {
-                Log.d("id is ", "" + student.getId());
-                Log.d("student id is ", "" + student.getStudentId());
-                Log.d("student name is ", "" + student.getStudentName());
-                Log.d("college id is ", "" + student.getCollege().getCollegeId());
-                Log.d("college name is ", "" + student.getCollege().getCollegeName());
-
-                validStatus("Select");
-            } else {
-                inValidStatus();
-            }
+            validStatus("Select");
         } else {
             inValidStatus();
         }
+
+    }
+
+
+    @OnClick(R.id.btn_select_college)
+    public void selectCollegeRecord(View view) {
+
+        String cid = editTextCollegeId.getText().toString();
+        Log.d("in selection College Id is ", "" + cid);
+
+        mCollegeId = (cid == null ? -1 :
+                (cid.trim().length() > 0 ? Integer.parseInt(cid) : -1));
+
+        College college = College.getCollege(mCollegeId);
+
+        if (college != null) {
+            Log.d("id is ", "" + college.getId());
+            Log.d("college id is ", "" + college.getCollegeId());
+            Log.d("college name is ", "" + college.getCollegeName());
+            Log.d("there are  ", "" + college.getAllStudent().size() + " students in this college");
+
+            validStatus("Select");
+        } else {
+            inValidStatus();
+        }
+
     }
 
     @OnClick(R.id.btn_delete_student)
@@ -151,15 +180,11 @@ public class MainActivity extends ActionBarActivity {
                 (sid.trim().length() > 0 ? Integer.parseInt(sid) : -1));
 
         // Deleting student
-        ArrayList<Student> studentArrayList = (ArrayList<Student>) Student.getStudent(mStudentId);
+        Student student = Student.getStudent(mStudentId);
 
-        if (studentArrayList != null) {
-            if (studentArrayList.size() > 0) {
-                studentArrayList.get(0).delete();
-                validStatus("Delete");
-            } else {
-                inValidStatus();
-            }
+        if (student != null) {
+            student.delete();
+            validStatus("Delete");
 
         } else {
             inValidStatus();
@@ -177,16 +202,11 @@ public class MainActivity extends ActionBarActivity {
                 (cid.trim().length() > 0 ? Integer.parseInt(cid) : -1));
 
         // Deleting student
-        ArrayList<College> collegeArrayList = (ArrayList<College>) College.getCollege(mCollegeId);
+        College college = College.getCollege(mCollegeId);
 
-        if (collegeArrayList != null) {
-            if (collegeArrayList.size() > 0) {
-                collegeArrayList.get(0).delete();
-                validStatus("Delete");
-            } else {
-                inValidStatus();
-            }
-
+        if (college != null) {
+            college.delete();
+            validStatus("Delete");
         } else {
             inValidStatus();
         }
